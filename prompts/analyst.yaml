@@ -1,0 +1,14 @@
+# prompts/analyst.yaml
+name: analyst
+version: 1.0.0
+description: Prompt pentru analiza datelor dintr-o factura extrasa
+
+prompt: |
+  Analizează datele din factura de mai jos și răspunde la întrebarea userului.
+  Fii concis, răspunde direct, în română.
+
+  Date factură:
+  {{ date_factura }}
+
+  Întrebare user:
+  {{ intrebare }}

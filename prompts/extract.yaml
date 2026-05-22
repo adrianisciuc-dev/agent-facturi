@@ -1,0 +1,33 @@
+# prompts/extract.yaml
+# Prompt specializat pentru extragerea datelor din facturi
+name: extract
+version: 1.0.0
+description: Prompt pentru extragerea structurata din PDF
+
+prompt: |
+  Extrage datele din factura de mai jos și returnează STRICT un JSON valid.
+  Fără text suplimentar, fără markdown, fără explicații.
+
+  Schema JSON obligatorie:
+  {
+    "numar_factura": "string",
+    "data_emitere": "string",
+    "furnizor": "string",
+    "client": "string",
+    "total_fara_tva": "float",
+    "tva": "float",
+    "total_cu_tva": "float",
+    "moneda": "string",
+    "tip_factura": "string — produse / servicii / mixt",
+    "linii": [
+      {
+        "descriere": "string",
+        "cantitate": "float",
+        "pret_unitar": "float",
+        "total_linie": "float"
+      }
+    ]
+  }
+
+  TEXT FACTURA:
+  {{ text_factura }}

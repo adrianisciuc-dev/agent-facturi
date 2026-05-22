@@ -1,4 +1,22 @@
+from typing import Optional
 from pydantic import BaseModel, Field
+
+
+class CalculatorParams(BaseModel):
+    expression: str = Field(description="Expresia matematică de evaluat (ex: '115.31 - 12.80')")
+
+
+class DateParams(BaseModel):
+    format: Optional[str] = Field(default=None, description="Formatul datei (ex: '%Y-%m-%d'). Implicit: YYYY-MM-DD")
+
+
+class ReadPDFParams(BaseModel):
+    file_path: str = Field(description="Calea completă către fișierul PDF (ex: invoices/factura_1.pdf)")
+
+
+class ExtractInvoiceParams(BaseModel):
+    file_path: str = Field(description="Calea completă către fișierul PDF (ex: invoices/factura_1.pdf)")
+    output_dir: Optional[str] = Field(default=None, description="Folderul unde se salvează JSON-ul extras")
 
 
 # Parametrii pentru listarea facturilor dintr-un folder

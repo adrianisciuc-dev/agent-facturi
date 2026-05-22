@@ -3,10 +3,11 @@
 # Analogie dbt: astea sunt modelele intermediate — transforma inputul in ceva util
 
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 
-import anthropic
+from google import genai
 import pypdf
 
 from tools.params_models import (
@@ -17,9 +18,7 @@ from tools.params_models import (
 )
 from tools.registry import register_tool
 
-# Clientul Anthropic creat o singura data la import
-# Analogie: connection pool — nu redeschizi conexiunea la fiecare apel
-_client = anthropic.Anthropic()
+_client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
 # ─── TOOL 1: Calculator ──────────────────────────────────────────────────────
@@ -157,13 +156,11 @@ TEXT FACTURA:
 """
 
     try:
-        response = _client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=2000,
-            messages=[{"role": "user", "content": prompt}],
+        response = _client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt,
         )
-
-        raw_json = response.content[0].text.strip()
+        raw_json = response.text.strip()
 
         # LLM-ul uneori pune raspunsul in ```json ... ``` chiar daca ii zici sa nu
         # Curatam ca un TRIM() in SQL

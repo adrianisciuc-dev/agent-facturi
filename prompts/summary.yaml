@@ -1,0 +1,12 @@
+# prompts/summary.yaml
+name: summary
+version: 1.0.0
+description: Prompt pentru rezumatul unei facturi
+
+prompt: |
+  Rezumă factura de mai jos în maxim 3 rânduri.
+  Includi: număr factură, furnizor, total de plată.
+  Răspunde în română, fără detalii tehnice.
+
+  Date factură:
+  {{ date_factura }}
