@@ -1,9 +1,7 @@
 # tools/basic_tools.py
-# Aici stau functiile pe care agentul le poate "apela"
-# Analogie dbt: astea sunt modelele intermediate — transforma inputul in ceva util
-
 import json
 import os
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -22,13 +20,12 @@ _client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
 # ─── TOOL 1: Calculator ──────────────────────────────────────────────────────
-@register_tool  # decorator: inregistreaza functia in TOOL_REGISTRY automat la import
+@register_tool
 def calculator(params: CalculatorParams) -> str:
     """Evaluează o expresie matematică simplă cu operatori +, -, *, /.
     Folosește pentru calcule numerice exacte, sume de facturi, conversii valutare.
     NU folosi pentru text sau logică non-numerică."""
 
-    # Whitelist de caractere permise — securitate minimala impotriva eval malitios
     allowed = set("0123456789+-*/(). ")
     if not all(c in allowed for c in params.expression):
         return "Eroare: expresie invalida — caractere nepermise."
@@ -60,7 +57,6 @@ def read_pdf(params: ReadPDFParams) -> str:
 
     path = Path(params.file_path)
 
-    # Validari de baza — verificam ca fisierul exista si e PDF
     if not path.exists():
         return f"Eroare: fisierul '{params.file_path}' nu exista."
     if path.suffix.lower() != ".pdf":
@@ -71,8 +67,8 @@ def read_pdf(params: ReadPDFParams) -> str:
         pages_text = []
 
         for i, page in enumerate(reader.pages):
-            text = page.extract_text() or ""  # or "" pt ca poate returna None
-            if text.strip():                   # ignoram paginile goale
+            text = page.extract_text() or ""
+            if text.strip():
                 pages_text.append(f"=== Pagina {i + 1} ===\n{text.strip()}")
 
         if not pages_text:
@@ -106,7 +102,6 @@ def extract_invoice(params: ExtractInvoiceParams) -> str:
         return f"Eroare: fisierul '{params.file_path}' nu exista."
 
     # ── EXTRACT: citim PDF-ul cu pypdf ────────────────────────────────────────
-    # Analogie dbt: sursa bruta din staging
     try:
         reader = pypdf.PdfReader(str(path))
         pages_text = []
@@ -125,7 +120,6 @@ def extract_invoice(params: ExtractInvoiceParams) -> str:
         return f"Eroare citire PDF: {str(e)}"
 
     # ── TRANSFORM: LLM transforma textul brut in JSON structurat ─────────────
-    # Analogie dbt: modelul intermediate — datele capata forma finala
     prompt = f"""Ești un expert în procesarea facturilor românești.
 Extrage datele din factura de mai jos și returnează STRICT un JSON valid,
 fără text suplimentar, fără markdown, fără explicații.
@@ -155,15 +149,16 @@ TEXT FACTURA:
 {raw_text}
 """
 
+    time.sleep(3)
+
     try:
         response = _client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.5-flash",
             contents=prompt,
         )
         raw_json = response.text.strip()
 
-        # LLM-ul uneori pune raspunsul in ```json ... ``` chiar daca ii zici sa nu
-        # Curatam ca un TRIM() in SQL
+        # curatam markdown daca LLM-ul l-a adaugat
         if raw_json.startswith("```"):
             raw_json = raw_json.split("```")[1]
             if raw_json.startswith("json"):
@@ -178,28 +173,23 @@ TEXT FACTURA:
         return f"Eroare la apelul LLM: {str(e)}"
 
     # ── LOAD: scriem JSON pe disc ─────────────────────────────────────────────
-    # Analogie dbt: materialized='table' — rezultatul transformarii e persisted
     try:
         output_dir = Path(params.output_dir or "extracted_data/facturi")
-        output_dir.mkdir(parents=True, exist_ok=True)  # creaza folderul daca nu exista
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Numele fisierului = numarul facturii, fara caractere speciale
         numar = invoice_data.get("numar_factura", path.stem)
         safe_name = "".join(c for c in numar if c.isalnum() or c in "-_")
         output_path = output_dir / f"{safe_name}.json"
 
         with open(output_path, "w", encoding="utf-8") as f:
-            # ensure_ascii=False = caracterele romane (ă, î, ș) se scriu corect
             json.dump(invoice_data, f, ensure_ascii=False, indent=2)
 
     except Exception as e:
-        # Salvarea a esuat, dar returnam datele oricum — userul nu ramane cu nimic
         return (
             f"Extractie reusita dar eroare la salvare ({str(e)}):\n"
             f"{json.dumps(invoice_data, ensure_ascii=False, indent=2)}"
         )
 
-    # Rezumat final returnat agentului
     return (
         f"Factura procesata cu succes!\n"
         f"  Numar:    {invoice_data.get('numar_factura', 'N/A')}\n"

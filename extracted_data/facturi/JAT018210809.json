@@ -1,0 +1,43 @@
+{
+  "numar_factura": "JAT018210809",
+  "data_emitere": "12.05.2026",
+  "furnizor": "Orange Romania S.A.",
+  "client": "ISCIUC CONSTANTIN ADRIAN",
+  "total_fara_tva": 63.42,
+  "tva": 13.32,
+  "total_cu_tva": 99.88,
+  "moneda": "LEI",
+  "tip_factura": "mixt",
+  "linii": [
+    {
+      "descriere": "Abonament Smart Elite",
+      "cantitate": 1.0,
+      "pret_unitar": 119.24,
+      "total_linie": 119.24
+    },
+    {
+      "descriere": "Aplicatii si continut digital",
+      "cantitate": 1.0,
+      "pret_unitar": 13.98,
+      "total_linie": 13.98
+    },
+    {
+      "descriere": "Penalitati de intarziere",
+      "cantitate": 1.0,
+      "pret_unitar": 3.56,
+      "total_linie": 3.56
+    },
+    {
+      "descriere": "Penalitati de intarziere rate",
+      "cantitate": 1.0,
+      "pret_unitar": 5.6,
+      "total_linie": 5.6
+    },
+    {
+      "descriere": "Red.ab. Smart Elite",
+      "cantitate": 1.0,
+      "pret_unitar": -55.82,
+      "total_linie": -55.82
+    }
+  ]
+}

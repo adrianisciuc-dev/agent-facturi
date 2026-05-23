@@ -1,0 +1,31 @@
+{
+  "numar_factura": "OTG69224",
+  "data_emitere": "16/04/2026",
+  "furnizor": "ORIGINS TRADING GROUP SRL",
+  "client": "Isciuc Adrian",
+  "total_fara_tva": -12.68,
+  "tva": 12.68,
+  "total_cu_tva": 0.0,
+  "moneda": "RON",
+  "tip_factura": "produse",
+  "linii": [
+    {
+      "descriere": "(6426390847362) Aromatic Blend (Beandrops) - 1kg",
+      "cantitate": 1.0,
+      "pret_unitar": 115.31,
+      "total_linie": 115.31
+    },
+    {
+      "descriere": "(Discount) Reducere conform voucher: xxxx-xxxx-xxxx-6706",
+      "cantitate": 1.0,
+      "pret_unitar": -12.8,
+      "total_linie": -12.8
+    },
+    {
+      "descriere": "(Discount) Reducere conform voucher: xxxx-xxxx-xxxx-7849",
+      "cantitate": 1.0,
+      "pret_unitar": -115.19,
+      "total_linie": -115.19
+    }
+  ]
+}
